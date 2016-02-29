@@ -1,8 +1,4 @@
-var thinky = require('thinky')({
-	host: 'localhost',
-	port: 28015,
-	db: 'HRM'
-});
+var thinky = require('./utils');
 
 var r = thinky.r;
 
@@ -22,6 +18,7 @@ exports.list = function(req, res){
 };
 
 exports.add = function(req, res){
+	console.log(req);
 	Department.save(req.body).then(function(result){
 		res.json(result);
 	}).error(function(err){
@@ -39,6 +36,7 @@ exports.get = function(req,res){
 
 //body must be raw on request
 exports.delete = function(req,res){
+
 	Department.get(req.params.id).delete().execute().then(function(result){
 			res.json(result);
 		}).error(function(err){

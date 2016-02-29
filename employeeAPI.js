@@ -1,14 +1,11 @@
-var thinky = require('thinky')({
-	host: 'localhost',
-	port: 28015,
-	db: 'HRM'
-});
+var thinky = require('./utils');
 
 var Employee = thinky.createModel('Employee',{
 	name: String,
 	lastName: String,
 	departmentId: String,
-	pin: Number
+	completeName: String,
+	type: String
 });
 
 Employee.ensureIndex('name');
@@ -22,13 +19,12 @@ exports.list = function(req, res){
 };
 
 exports.add = function(req, res){
-	Employee.save().then(function(result){
+	Employee.save(req.body).then(function(result){
 		res.json(result);
 	}).error(function(err){
 		res.json({message: err});
 	});
 };
-
 
 exports.get = function(req, res){
 	Employee.get(req.params.id).run().then(function(employee){
