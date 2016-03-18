@@ -5,21 +5,30 @@ var Employee = thinky.createModel('Employee',{
 	lastName: String,
 	departmentId: String,
 	completeName: String,
+	pin: Number,
 	type: String
 });
 
 Employee.ensureIndex('name');
 
+exports.Employee = Employee;
+
 exports.list = function(req, res){
-	Employee.orderBy({index: 'name'}).run().then(function(employees){
-		res.json(employees);
+	Employee.orderBy({index: 'name'}).getJoin({department: true}).run().then(function(employees){
+		console.log(employees);
+		res.json({
+			data: employees,
+			profile: res.decoded[0]
+		});
 	}).error(function(err){
 		res.json({message:err});
 	});
 };
 
 exports.add = function(req, res){
-	Employee.save(req.body).then(function(result){
+	var employee = new Employee(req.body);
+
+	employee.saveAll({department: true}).then(function(result){
 		res.json(result);
 	}).error(function(err){
 		res.json({message: err});
@@ -35,7 +44,8 @@ exports.get = function(req, res){
 };
 
 exports.update = function(req, res){
-	Employee.get(req.params.id).update(req.params).run().then(function(result){
+	delete req.body['department'];
+	Employee.get(req.params.id).update(req.body).run().then(function(result){
 		res.json(result);
 	}).error(function(err){
 		res.json({message: err});
