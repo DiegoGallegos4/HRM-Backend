@@ -15,7 +15,8 @@ exports.list = function(req, res){
 	Department.orderBy({index: 'name'}).run().then(function(departments){
 		res.json({
 			data: departments,
-			profile: res.decoded[0]
+			profile: res.decoded[0],
+			success: true
 		});
 	}).error(function(err){
 		res.json({message: err});

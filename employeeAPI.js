@@ -11,14 +11,15 @@ var Employee = thinky.createModel('Employee',{
 
 Employee.ensureIndex('name');
 
+
 exports.Employee = Employee;
 
 exports.list = function(req, res){
 	Employee.orderBy({index: 'name'}).getJoin({department: true}).run().then(function(employees){
-		console.log(employees);
 		res.json({
 			data: employees,
-			profile: res.decoded[0]
+			profile: res.decoded[0],
+			success: true
 		});
 	}).error(function(err){
 		res.json({message:err});
@@ -27,7 +28,6 @@ exports.list = function(req, res){
 
 exports.add = function(req, res){
 	var employee = new Employee(req.body);
-
 	employee.saveAll({department: true}).then(function(result){
 		res.json(result);
 	}).error(function(err){

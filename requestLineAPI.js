@@ -1,4 +1,5 @@
 var thinky = require('./utils');
+var employee = require('./employeeAPI').Employee;
 
 var RequestLine = thinky.createModel('RequestLine',{
 	requestID: String,
@@ -6,17 +7,20 @@ var RequestLine = thinky.createModel('RequestLine',{
 	transportation: Boolean,
 	approved: Boolean,
 	transportationConfirmation: Boolean,
-	feedingId: String
+	feedingId: String,
+	employeeID: String
 });
 
 RequestLine.ensureIndex('requestID');
-
+RequestLine.belongsTo(employee,'employee','employeeID','id');
+// RequestLine.hasOne(feeding,'feed','id','reqLineId');
 
 exports.list = function(req, res){
-	RequestLine.orderBy({index: 'requestID'}).getJoin({request: true}).run().then(function(requestLines){
+	RequestLine.orderBy({index: 'requestID'}).getJoin({request: true, employee: true}).run().then(function(requestLines){
 		res.json({
 			data: requestLines,
-			profile: res.decoded[0]
+			profile: res.decoded[0],
+			success: true
 		});
 	}).error(function(err){
 		res.json({message:err});
@@ -33,7 +37,8 @@ exports.add = function(req, res){
 };
 
 exports.get = function(req, res){
-	RequestLine.get(req.params.id).run().then(function(requestLine){
+	RequestLine.get(req.params.id).getJoin({employee: true}).run().then(function(requestLine){
+		console.log(requestLine);
 		res.json(requestLine);
 	}).error(function(err){
 		res.json({message: err});
